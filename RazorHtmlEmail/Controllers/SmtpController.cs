@@ -44,7 +44,9 @@ namespace RazorHtmlEmail.Controllers
 
             foreach (Person person in persons)
             {
+                //
                 // TODO: substitute different layout
+                //
 
                 //
                 // render Razor page as HTML
@@ -83,13 +85,15 @@ namespace RazorHtmlEmail.Controllers
             if (ModelState.IsValid)
             {
             
+                // TODO: allow Markdown to be used in the form's body; convert Markdown to HTML here.
+
                 // create message
                 using (MailMessage mailMessage = new MailMessage
                 {
                     // send mail from system account
                     From = new MailAddress(_smtpSettings.SmtpFromAddress, _smtpSettings.SmtpFromName),
                     Subject = model.Subject,
-                    Body = model.Body,
+                    Body = model.Body, 
                     IsBodyHtml = true
                 })
                 {
