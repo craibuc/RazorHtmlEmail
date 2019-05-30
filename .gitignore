@@ -1,3 +1,6 @@
+# project-specific
+**/secrets.json
+
 # globs
 Makefile.in
 *.userprefs
