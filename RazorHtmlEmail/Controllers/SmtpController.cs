@@ -29,29 +29,26 @@ namespace RazorHtmlEmail.Controllers
             _renderer = renderer;
         }
 
-        public async Task SendTemplate()
+        public async Task Template()
         {
 
             // dummy list of people
             List<Person> persons = new List<Person>
             {
-                new Person { FirstName = "John", LastName = "Doe", EmailAddress = "john.doe@company.com" }
+                new Person { FirstName = "John", LastName = "Doe", EmailAddress = "john.doe@mailinator.com" }
             };
 
-            persons.Add(new Person { FirstName = "Jane", LastName = "Doe", EmailAddress = "jane.doe@company.com" });
+            persons.Add(new Person { FirstName = "Jane", LastName = "Doe", EmailAddress = "jane.doe@mailinator.com" });
 
             // send a targeted email to each person
 
             foreach (Person person in persons)
             {
-                //
-                // TODO: substitute different layout
-                //
 
                 //
                 // render Razor page as HTML
                 //
-                var body = await _renderer.RenderViewToStringAsync("/Views/Smtp/Template.cshtml", person);
+                var body = await _renderer.RenderViewToStringAsync("/Views/EmailTemplates/Template.cshtml", person);
 
                 // create message
                 using (MailMessage mailMessage = new MailMessage
@@ -63,12 +60,13 @@ namespace RazorHtmlEmail.Controllers
                     IsBodyHtml = true
                 })
                 {
+                    mailMessage.To.Add(new MailAddress(person.EmailAddress, person.FullName));
                     await SendMessage(mailMessage);
                 }
 
             } // foreach
 
-        } // SendTemplate
+        } // Template
 
         // GET: /Smtp/Create
         public IActionResult Create()
