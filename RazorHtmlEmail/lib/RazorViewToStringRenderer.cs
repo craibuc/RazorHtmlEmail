@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 /*
  *  Source: https://github.com/aspnet/Entropy/blob/dev/samples/Mvc.RenderViewToString/RazorViewToStringRenderer.cs
+ * https://gist.github.com/scottsauber/8c06ef3984456b2955b6f0f49b53a755
  */
 
 namespace RazorHtmlEmail.lib
@@ -23,16 +24,17 @@ namespace RazorHtmlEmail.lib
     {
         private IRazorViewEngine _viewEngine;
         private ITempDataProvider _tempDataProvider;
-        private IServiceProvider _serviceProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public RazorViewToStringRenderer(
             IRazorViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
-            IServiceProvider serviceProvider)
+            IHttpContextAccessor httpContextAccessor
+            )
         {
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
-            _serviceProvider = serviceProvider;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<string> RenderViewToStringAsync<TModel>(string viewName, TModel model)
@@ -55,12 +57,18 @@ namespace RazorHtmlEmail.lib
                         actionContext.HttpContext,
                         _tempDataProvider),
                     output,
-                    new HtmlHelperOptions());
+                    new HtmlHelperOptions()
+                )
+                {
+                    RouteData = _httpContextAccessor.HttpContext.GetRouteData()
+                };
 
                 await view.RenderAsync(viewContext);
 
                 return output.ToString();
-            }
+
+            } // using
+
         }
 
         private IView FindView(ActionContext actionContext, string viewName)
@@ -87,11 +95,7 @@ namespace RazorHtmlEmail.lib
 
         private ActionContext GetActionContext()
         {
-            var httpContext = new DefaultHttpContext
-            {
-                RequestServices = _serviceProvider
-            };
-            return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            return new ActionContext(_httpContextAccessor.HttpContext, new RouteData(), new ActionDescriptor());
         }
 
     }

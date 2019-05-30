@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using RazorHtmlEmail.lib;
 using RazorHtmlEmail.Models.Settings;
 
@@ -33,6 +35,9 @@ namespace RazorHtmlEmail
             //
             var smtpSettings = Configuration.GetSection("SmtpSettings");
             services.Configure<SmtpSettings>(smtpSettings);
+
+            services.AddHttpContextAccessor();
+            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             //
             // add Razor-rendering library
